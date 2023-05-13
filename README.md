@@ -13,7 +13,7 @@ The model used for the Image Classification is MobileNetV2 (located in assets/mo
 The aim of the project is to support easy extension to other image data providers and models via
 abstraction layers (e.g. image_preproprocessor and model handler classes).
 
-Software was tested on an Ubuntu 22.04 x86_64 machine.
+Software was tested on Ubuntu 16.04.1 and Ubuntu 22.04 x86_64 machines.
 
 For Linux all dependencies are automatically installed by running the setup.sh script
 For other OS and platform architectures you will need to check the setup.sh script and replicate
@@ -26,11 +26,11 @@ the steps on your corresponding OS/platform consulting the thirdparty documentat
   * Linux: make is installed by default on most Linux distros
   * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
   * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
-* gcc/g++ >= 5.4
-  * Linux: gcc / g++ is installed by default on most Linux distros
+* gcc/g++ >= 9.4.0
+  * Linux: gcc / g++ is installed by default on most Linux distros (however setup.sh includes the install command for gcc/g++ 9)
   * Mac: same deal as make - [install Xcode command line tools](https://developer.apple.com/xcode/features/)
   * Windows: recommend using [MinGW](http://www.mingw.org/)
-* opencv-4.x
+* opencv 4.x
   * Linux: Automatically installed by running setup.sh
   * Other OS/platforms: Please follow steps in setup.sh and consult the appropriate opencv documentation for your OS and platform
 * onnxruntime 1.13.1

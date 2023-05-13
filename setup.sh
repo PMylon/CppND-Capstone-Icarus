@@ -19,3 +19,5 @@ cmake  ../opencv-4.x
 cmake --build .
 # Install
 sudo make install
+# Install gcc-9 and g++-9
+sudo apt install gcc-9 g++-9
