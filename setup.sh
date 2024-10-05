@@ -36,7 +36,7 @@ install_macos_dependencies()
 	brew install cmake wget llvm
 
 	# Install deps for cvNamedWindow
-	#brew install pkg-config # TODO: NOT sure if needed!
+	brew install gtk+3 pkg-config
 	
 	# Dynamically set LLVM paths using brew --prefix
     LLVM_PATH=$(brew --prefix llvm)
@@ -92,7 +92,7 @@ build_opencv()
 	echo "Building OpenCV..."
 	mkdir -p build && cd build
 	# Cannot link for arm64 with gapi for MacOS; disable it as we dont use it
-	cmake ../"opencv-${OPENCV_VERSION}" -D BUILD_opencv_gapi=OFF
+	cmake ../"opencv-${OPENCV_VERSION}" -D BUILD_opencv_gapi=OFF -D WITH_GTK=ON
 	cmake --build .	
 }
 
