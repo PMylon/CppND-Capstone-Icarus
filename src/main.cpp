@@ -17,6 +17,17 @@
 #include <utility>
 #include <future>
 
+// macOS Cocoa requires that UI processing is done in the main thread
+#if defined(__APPLE__)
+#define runImageDisplayMainThread(prmsTerminate) ImageDisplayThread(prmsTerminate)
+#define joinImageDisplayMainThread()
+#define isImageWindowClosed(windowName) (cv::getWindowProperty(windowName, cv::WND_PROP_VISIBLE) < 1)
+#else
+#define runImageDisplayMainThread(prmsTerminate) std::thread imageDisplayThread{ImageDisplayThread, prmsTerminate}
+#define joinImageDisplayMainThread() imageDisplayThread.join();
+#define isImageWindowClosed(windowName) (cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) < 0)
+#endif
+
 std::condition_variable cvInputAvailable;
 std::mutex mtxInput;
 std::queue<Image> inputImageQueue;
@@ -117,7 +128,6 @@ void InferenceThread(std::shared_future<void> futTerminate)
 void ImageDisplayThread(std::promise<void>&& prmsTerminate)
 {
     const std::string& displayWindowName = "Classifier Result Window";
-
     cv::namedWindow(displayWindowName, cv::WINDOW_NORMAL);
 
     while (true)
@@ -147,15 +157,13 @@ void ImageDisplayThread(std::promise<void>&& prmsTerminate)
         int displayWindowHeight = img.height + titleSize.height + 20;
         int displayWindowWidth = std::max(img.width, titleSize.width + 20);
 
-        cv::resizeWindow(displayWindowName, displayWindowWidth, displayWindowHeight);
+        cv::resizeWindow(displayWindowName, displayWindowWidth, displayWindowHeight);		
         cv::imshow(displayWindowName, img.matrix);
-
         cv::setWindowTitle(displayWindowName, predictedClass + "----" + inferenceTimeOss.str());
-
-        cv::waitKey(1500); 
+        cv::waitKey(1500);
 
         // Check window's property in order to determine if window was closed
-        if (cv::getWindowProperty(displayWindowName, cv::WND_PROP_AUTOSIZE) < 0)
+        if (isImageWindowClosed(displayWindowName))
         {
             prmsTerminate.set_value();
             break;
@@ -172,11 +180,11 @@ int main() {
 
     std::thread imageCaptureThread{ImageCaptureThread, futTerminate};
     std::thread inferenceThread{InferenceThread, futTerminate};
-    std::thread imageDisplayThread{ImageDisplayThread, std::move(prmsTerminate)};
+    runImageDisplayMainThread(std::move(prmsTerminate));
 
     imageCaptureThread.join();
     inferenceThread.join();
-    imageDisplayThread.join();
+    joinImageDisplayMainThread();
 
     return EXIT_SUCCESS;
 }

@@ -1,4 +1,4 @@
 mkdir -p build
-cp -ru assets build/
+rsync -av --update assets build/
 cd build
 cmake .. && make
